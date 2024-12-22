@@ -12,7 +12,12 @@ void setup() {
   esp_sleep_enable_ext0_wakeup(GPIO_NUM_4, 1);
   rtc_gpio_pullup_dis(GPIO_NUM_4);
   rtc_gpio_pulldown_en(GPIO_NUM_4);
-  delay(1);
+  if(dist.measureClosing()){
+    if(dist.getDistance() <= 100){
+      Serial.print("ok");
+    };
+  }
+  esp_deep_sleep_start();
 }
 
 void loop() {

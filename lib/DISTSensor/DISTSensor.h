@@ -9,5 +9,6 @@ class DISTSensor{
     public:
         void begin();
         bool measureClosing();
+        uint16_t getDistance();
         bool measure();
 };
