@@ -1,38 +1,22 @@
 #include <Arduino.h>
 #include <DISTSensor.h>
+#include <ESP32Servo.h>
 
 class Vision{ // Classe do sensor de distância
     private:
-        DISTSensor dist;
+        // DISTSensor dist;
     public:
-    void eyeLeft(){ // Movimentar o sensor para a direita com um servo motor
-        Serial.println("eyeLeft");
-        delay(1500);
-        dist.setDistances(0); // Setar o valor do índice 0 da variável distâncias
-    }
+    void begin();
+
+    void eyeLeft(DISTSensor& dist); // Movimentar o sensor para a direita com um servo motor
     // O mesmo se repete para right e center
-    void eyeRight(){
-        Serial.println("eyeRight");
-        delay(1500);
-        dist.setDistances(2);
-    }
+    void eyeRight(DISTSensor& dist);    
 
-    void eyeCenter(){
-        Serial.println("eyeCenter");
-        delay(1500);
-        dist.setDistances(1);
-    }
+    void eyeCenter(DISTSensor& dist);
 
-    void reading(){ // Leitura de valores de distância à esqueda, centro e direita, preenchendo os índices do array
-        eyeLeft();
-        eyeCenter();
-        eyeRight();
-        eyeCenter();       
-    }
+    void reading(DISTSensor& dist);
 
-    u_int16_t* getDistances(){ // Obtenção do array distance[]
-        return dist.getDistances();
-    }
+    u_int16_t* getDistances(DISTSensor& dist);
 
 };
 
@@ -45,8 +29,10 @@ class Car{ // Classe de controle do carrinho
 
         // Encontrar o menor valor no array de distâncias
         for (int i = 1; i < 3; i++) {
+            Serial.println("Distancias");
+            Serial.println(distances[i]);
             if (distances[i] < distances[smallestIndex]) {
-                Serial.println("Distância lida:" + String(distances[i]));
+                Serial.println("Distância lida:" + String(distances[i] + "na posição" + String(i)));
                 smallestIndex = i;
             }
         }
@@ -78,11 +64,11 @@ class Car{ // Classe de controle do carrinho
 
     public:
 
-    void mind(){ // Função que faz o carrinho agir
+    void mind(DISTSensor& dist){ // Função que faz o carrinho agir (recebendo a referência do ponteiro dist (&), para usar o mesmo objeto que foi criado no início do programa)
         u_int16_t now = millis();
         while (millis() - now < 10000){
-            vis.reading();
-            u_int16_t* distances =  vis.getDistances();
+            vis.reading(dist);
+            u_int16_t* distances =  vis.getDistances(dist);
             Direction dir = decideDirection(distances);
             if(dir != straight) turn(dir);
             else forward();

@@ -3,7 +3,7 @@
 // Função para detectar algo se aproximando
 bool DISTSensor::measureClosing(){
     uint8_t minDiff = 10; // Velocidade com que a coisa precisa estar se aproximando (diferença entre a posição atual do objeto e da leitura anterior)
-    VL53L0X_RangingMeasurementData_t measure; // Variável que irá guardar os valores de distância
+    // VL53L0X_RangingMeasurementData_t measure; // Variável que irá guardar os valores de distância
     lox.rangingTest(&measure, false); // Obtendo leituras de distância (true salvaria também mensagens de debug)
     uint16_t lastMeasure = measure.RangeMilliMeter; // Variável usada para comparar valores de distância
     bool closing = 0; // Variável para identificar se há algo chegando
@@ -23,28 +23,36 @@ bool DISTSensor::measureClosing(){
         }
         lastMeasure = measure.RangeMilliMeter;
         delay(1);
+        Serial.println(measure.RangeMilliMeter);
     }
     return 0;
 }
 
-uint16_t DISTSensor::getDistance(){
-    VL53L0X_RangingMeasurementData_t measure;
-    // if (esp_sleep_get_wakeup_cause() == ESP_SLEEP_WAKEUP_EXT0) { // Por algum motivo, quando a função "mind" precisa chamar essa função getDistance, é preciso reinicializar o objeto do sensor de distância
-    lox.begin();  // Reiniciando o sensor por que POR ALGUM MOTIVO, na hora que a função "mind" chama a getDistance o sensor não está mais inicializado
+uint16_t DISTSensor::getDistance(){  
+    // if (esp_sleep_get_wakeup_cause() == ESP_SLEEP_WAKEUP_EXT0) { // Por algum motivo, quando a função "mind" precisa chamar essa função getDistance, é preciso reinicializar o objeto do sensor de dis
+    delay(10);
+    // lox.begin();  // Reiniciando o sensor por que POR ALGUM MOTIVO, na hora que a função "mind" chama a getDistance o sensor não está mais inicializado
     // }
     lox.rangingTest(&measure, false); // Leitura do sensor de distância
     if (measure.RangeStatus != 4) {  // Caso não haja falha na leitura
+        Serial.println(measure.RangeMilliMeter);
         return measure.RangeMilliMeter; // retorna a distância
     } else {
         return 6000; // Caso haja falha, retorna um valor qualquer
     }
+    
 }
 
 u_int16_t* DISTSensor::getDistances(){
+    Serial.println("elas:");
+    for(int i = 0; i<3; i++){
+        Serial.println(distances[i]);
+    }
     return distances; // Retorna um array com 3 distâncias
 }
 
 void DISTSensor::setDistances(u_int8_t pos){ // Função para setar um valor no array distances[]
+    // begin();
     if(pos < 3){ // Teste para ver se o índice selecionado está ok
         distances[pos] = getDistance(); // Leitura da distância pelo sensor de distância e preenchimento do array
     }
