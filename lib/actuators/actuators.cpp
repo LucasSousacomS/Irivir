@@ -51,3 +51,52 @@ void Vision::reading(DISTSensor& dist){ // Leitura de valores de distância à e
 u_int16_t* Vision::getDistances(DISTSensor& dist){ // Obtenção do array distance[]
     return dist.getDistances();
 }
+
+Car::Direction Car::decideDirection(u_int16_t* distances){
+    int smallestIndex = 0; // Variável para comparação de valores do array
+
+    // Encontrar o menor valor no array de distâncias
+    for (int i = 1; i < 3; i++) {
+        Serial.println("Distancias");
+        Serial.println(distances[i]);
+        if (distances[i] < distances[smallestIndex]) {
+            Serial.println("Distância lida:" + String(distances[i] + "na posição" + String(i)));
+            smallestIndex = i;
+        }
+    }
+
+    // Decidir para onde virar
+    if (distances[smallestIndex] <= 500) {
+        Serial.println("A menor Distância lida:" + String(distances[smallestIndex]));
+        if (smallestIndex == 0) return right; // O valor lido quando o sensor está na esquerda (eyeLeft) é guardado no índice 0
+        if (smallestIndex == 2) return left; // O valor lido quando o sensor está na direita (eyeRight) é guardado no índice 2
+    }
+    return straight; // Padrão se não estiver perto de nada
+}
+
+void Car::turn(Direction dir){
+    if(dir == left){ 
+        Serial.print("Virar à esquerda");
+    }else{
+        Serial.print("Virar à direita");
+    }
+}
+
+void Car::forward(){
+    Serial.println("Frente");
+}
+
+void Car::backward(){ // Função para fazer o carrinho andar pra trás
+    Serial.println("Trás");
+}
+
+void Car::mind(DISTSensor& dist){
+    u_int16_t now = millis();
+    while (millis() - now < 10000){
+        vis.reading(dist);
+        u_int16_t* distances =  vis.getDistances(dist);
+        Direction dir = decideDirection(distances);
+        if(dir != straight) turn(dir);
+        else forward();
+    }
+}
