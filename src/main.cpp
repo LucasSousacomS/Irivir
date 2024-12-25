@@ -8,11 +8,10 @@ DISTSensor dist;
 Car car;
 Vision vision;
 
-void setup() {
-  
+void setup() {  
   Serial.begin(9600);
   dist.begin();
-  vision.begin();
+  car.begin();
   esp_sleep_enable_ext0_wakeup(GPIO_NUM_4, 1);
   rtc_gpio_pullup_dis(GPIO_NUM_4);
   rtc_gpio_pulldown_en(GPIO_NUM_4);

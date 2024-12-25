@@ -1,7 +1,20 @@
 #include <actuators.h>
 #define servoPin 13
 #define servoDelay 7
+#define pwmChannel1 2
+#define pwmChannel2 3
 
+#define motor1Pin1  27
+#define motor1Pin2  26
+#define motor2Pin1  25
+#define motor2Pin2  33
+#define enable1Pin  14
+#define enable2Pin  12
+
+
+uint8_t resolution = 8;
+uint32_t freq = 30000;
+int dutyCycle = 200;
 Servo servo1;
 
 void Vision::begin(){
@@ -76,18 +89,48 @@ Car::Direction Car::decideDirection(u_int16_t* distances){
 
 void Car::turn(Direction dir){
     if(dir == left){ 
-        Serial.print("Virar à esquerda");
+        digitalWrite(motor1Pin1, LOW);
+        digitalWrite(motor1Pin2, LOW);
+        digitalWrite(motor2Pin1, LOW);
+        digitalWrite(motor2Pin2, HIGH);
+        for(int i = 100; i<255; i++){
+            ledcWrite(pwmChannel2, i);
+            delay(1);
+        }
     }else{
-        Serial.print("Virar à direita");
+        digitalWrite(motor1Pin1, LOW);
+        digitalWrite(motor1Pin2, HIGH);
+        digitalWrite(motor2Pin1, LOW);
+        digitalWrite(motor2Pin2, LOW);
+        for(int i = 100; i<255; i++){
+            ledcWrite(pwmChannel1, i);
+            delay(1);
+        }
     }
 }
 
 void Car::forward(){
-    Serial.println("Frente");
+    digitalWrite(motor1Pin1, HIGH);
+    digitalWrite(motor1Pin2, LOW);
+    digitalWrite(motor2Pin1, HIGH);
+    digitalWrite(motor2Pin2, LOW);
+    for(int i = 100; i<255; i++){
+        ledcWrite(pwmChannel1, i);
+        ledcWrite(pwmChannel2, i);
+        delay(1);
+    }
 }
 
 void Car::backward(){ // Função para fazer o carrinho andar pra trás
-    Serial.println("Trás");
+    digitalWrite(motor1Pin1, LOW);
+    digitalWrite(motor1Pin2, HIGH);
+    digitalWrite(motor2Pin1, LOW);
+    digitalWrite(motor2Pin2, HIGH);
+    for(int i = 100; i<255; i++){
+        ledcWrite(enable1Pin, i);
+        ledcWrite(enable2Pin, i);
+        delay(1);
+    }
 }
 
 void Car::mind(DISTSensor& dist){
@@ -99,4 +142,23 @@ void Car::mind(DISTSensor& dist){
         if(dir != straight) turn(dir);
         else forward();
     }
+}
+
+void Car::begin(){
+    Serial.println("Car initialized");
+    vis.begin();
+    pinMode(motor1Pin1, OUTPUT);
+    pinMode(motor1Pin2, OUTPUT);
+    pinMode(motor2Pin1, OUTPUT);
+    pinMode(motor2Pin2, OUTPUT);
+    pinMode(enable1Pin, OUTPUT);
+    pinMode(enable2Pin, OUTPUT);
+
+    ledcSetup(pwmChannel1, freq, resolution);
+    ledcSetup(pwmChannel2, freq, resolution);
+    
+    // configure LEDC PWM
+    ledcAttachPin(enable1Pin, pwmChannel1);
+    // configure LEDC PWM
+    ledcAttachPin(enable2Pin, pwmChannel2);
 }
