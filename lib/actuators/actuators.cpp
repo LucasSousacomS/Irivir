@@ -70,13 +70,13 @@ u_int16_t* Vision::getDistances(DISTSensor& dist){ // Obtenção do array distan
 
 Car::Direction Car::decideDirection(u_int16_t* distances){
     int smallestIndex = 0; // Variável para comparação de valores do array
-
+    Serial.print("--------------------------------------DECIDE DIRECITONS-----------------------------------");
     // Encontrar o menor valor no array de distâncias
     for (int i = 1; i < 3; i++) {
         Serial.println("Distancias");
         Serial.println(distances[i]);
         if (distances[i] < distances[smallestIndex]) {
-            Serial.println("Distância lida:" + String(distances[i] + "na posição" + String(i)));
+            // Serial.println("Distância lida:" + String(distances[i] + "na posição" + String(i)));
             smallestIndex = i;
         }
     }
@@ -94,21 +94,27 @@ void Car::turn(Direction dir){
     if(dir == left){ 
         digitalWrite(motor1Pin1, LOW);
         digitalWrite(motor1Pin2, LOW);
-        digitalWrite(motor2Pin1, LOW);
-        digitalWrite(motor2Pin2, HIGH);
-        for(int i = 100; i<255; i++){
-            ledcWrite(pwmChannel2, i);
-            delay(1);
+        digitalWrite(motor2Pin1, HIGH);
+        digitalWrite(motor2Pin2, LOW);
+        if(lastDir != left){
+            for(int i = 100; i<255; i++){
+                ledcWrite(pwmChannel2, i);
+                delay(1);
+            }
         }
+        lastDir = left;
     }else{
-        digitalWrite(motor1Pin1, LOW);
-        digitalWrite(motor1Pin2, HIGH);
+        digitalWrite(motor1Pin1, HIGH);
+        digitalWrite(motor1Pin2, LOW);
         digitalWrite(motor2Pin1, LOW);
         digitalWrite(motor2Pin2, LOW);
-        for(int i = 100; i<255; i++){
-            ledcWrite(pwmChannel1, i);
-            delay(1);
+        if(lastDir != right){
+            for(int i = 100; i<255; i++){
+                ledcWrite(pwmChannel1, i);
+                delay(1);
+            }
         }
+        lastDir = right;
     }
 }
 
@@ -117,11 +123,14 @@ void Car::forward(){
     digitalWrite(motor1Pin2, LOW);
     digitalWrite(motor2Pin1, HIGH);
     digitalWrite(motor2Pin2, LOW);
-    for(int i = 100; i<255; i++){
-        ledcWrite(pwmChannel1, i);
-        ledcWrite(pwmChannel2, i);
-        delay(1);
-    }
+    if(lastDir != straight){
+        for(int i = 100; i<255; i++){
+            ledcWrite(pwmChannel1, i);
+            ledcWrite(pwmChannel2, i);
+            delay(1);
+        }
+    }    
+    lastDir = straight;
 }
 
 void Car::backward(){ // Função para fazer o carrinho andar pra trás

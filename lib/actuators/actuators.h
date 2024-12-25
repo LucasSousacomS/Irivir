@@ -25,6 +25,7 @@ class Vision{ // Classe do sensor de distância
 class Car{ // Classe de controle do carrinho
     private:
     enum Direction: u_int8_t{left = 0, right = 1, straight = 2}; // Configurando valores a serem considerados para direções do carrinho usando um enum
+    Direction lastDir;
     Vision vis;
     Direction decideDirection(uint16_t* distances); // Função que decide a direção que o carrinho irá se mover
 
