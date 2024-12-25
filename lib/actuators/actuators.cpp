@@ -11,6 +11,10 @@
 #define enable1Pin  14
 #define enable2Pin  12
 
+#define leftAngle 130
+#define rightAngle 50
+#define straightAngle 90
+
 
 uint8_t resolution = 8;
 uint32_t freq = 30000;
@@ -23,7 +27,7 @@ void Vision::begin(){
 }
 
 void Vision::eyeLeft(DISTSensor& dist){
-    for(int posDegrees = servo1.read(); posDegrees <= 180; posDegrees++) {
+    for(int posDegrees = servo1.read(); posDegrees <= leftAngle; posDegrees++) {
         servo1.write(posDegrees);
         delay(servoDelay);
     }
@@ -31,7 +35,7 @@ void Vision::eyeLeft(DISTSensor& dist){
 }
 
 void Vision::eyeRight(DISTSensor& dist){
-    for(int posDegrees = servo1.read(); posDegrees >= 0; posDegrees--) {
+    for(int posDegrees = servo1.read(); posDegrees >= rightAngle; posDegrees--) {
         servo1.write(posDegrees);
         delay(servoDelay);
     }
@@ -39,13 +43,13 @@ void Vision::eyeRight(DISTSensor& dist){
 }
 
 void Vision::eyeCenter(DISTSensor& dist){
-    if(servo1.read() > 90){
-        for(int posDegrees = servo1.read(); posDegrees >= 90; posDegrees--) {
+    if(servo1.read() > straightAngle){
+        for(int posDegrees = servo1.read(); posDegrees >= straightAngle; posDegrees--) {
         servo1.write(posDegrees);
         delay(servoDelay);
     }
     }else if(servo1.read()<90){
-        for(int posDegrees = servo1.read(); posDegrees <= 90; posDegrees++) {
+        for(int posDegrees = servo1.read(); posDegrees <= straightAngle; posDegrees++) {
             servo1.write(posDegrees);
             delay(servoDelay);
         }
@@ -55,10 +59,9 @@ void Vision::eyeCenter(DISTSensor& dist){
 
 void Vision::reading(DISTSensor& dist){ // Leitura de valores de distância à esqueda, centro e direita, preenchendo os índices do array
     // dist.begin(); // Precia chamar a função begin de novo pois estou usando um outro objeto para controlar o sensor agora (este dist não é o mesmo dist do main)
-    eyeLeft(dist);
-    eyeCenter(dist);
     eyeRight(dist);
-    eyeCenter(dist);       
+    eyeLeft(dist);
+    eyeCenter(dist);    
 }
 
 u_int16_t* Vision::getDistances(DISTSensor& dist){ // Obtenção do array distance[]
