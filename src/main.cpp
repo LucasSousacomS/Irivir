@@ -2,6 +2,7 @@
 #include <PIRSensor.h>
 #include "driver/rtc_io.h"
 #include <actuators.h>
+#include "esp_wifi.h"
 
 PIRSensor pir(4);
 DISTSensor dist;
@@ -9,6 +10,8 @@ Car car;
 Vision vision;
 
 void setup() {  
+  esp_wifi_stop();
+  esp_wifi_deinit();
   Serial.begin(9600);
   dist.begin();
   car.begin();

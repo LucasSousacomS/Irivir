@@ -5,3 +5,14 @@ Eu tenho uma gatinha que, no momento, se encontra com um peso um pouco elevado. 
 
 ## Funcionamento (planejado)
 Um carrinho que, ao detectar a presença de algo via sensor PIR, inicia uma rotina de movimento. Um sensor de distância laser conectado a um servo motor escaneia os arredores. Se detecta um obstáculo à 50 cm de distância em um lado, se movimenta para o outro (se encontra o obstáculo na direita, vira pra esquerda e vice versa). A cada tanto segundos, para de se movimentar. A quantidade de segundos é aleatória e ele pode tanto voltar a se mover sozinho aleatoriamente ou só quando detectar algo com o sensor PIR.
+
+
+## Pinagem
+Pino 13: Servo motor
+Pino 27: IN1
+Pino 26: IN2
+Pino 25: IN3
+Pino 33: IN4
+Pino 14: ENA
+Pino 12: ENB
+Pino 4: PIR

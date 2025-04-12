@@ -94,24 +94,24 @@ void Car::turn(Direction dir){
     if(dir == left){ 
         digitalWrite(motor1Pin1, LOW);
         digitalWrite(motor1Pin2, LOW);
-        digitalWrite(motor2Pin1, HIGH);
-        digitalWrite(motor2Pin2, LOW);
+        digitalWrite(motor2Pin1, LOW);
+        digitalWrite(motor2Pin2, HIGH);
         if(lastDir != left){
-            for(int i = 100; i<255; i++){
+            for(int i = 100; i<180; i++){
                 ledcWrite(pwmChannel2, i);
-                delay(1);
+                delay(10);
             }
         }
         lastDir = left;
     }else{
-        digitalWrite(motor1Pin1, HIGH);
-        digitalWrite(motor1Pin2, LOW);
+        digitalWrite(motor1Pin1, LOW);
+        digitalWrite(motor1Pin2, HIGH);
         digitalWrite(motor2Pin1, LOW);
         digitalWrite(motor2Pin2, LOW);
         if(lastDir != right){
-            for(int i = 100; i<255; i++){
+            for(int i = 100; i<180; i++){
                 ledcWrite(pwmChannel1, i);
-                delay(1);
+                delay(10);
             }
         }
         lastDir = right;
@@ -119,29 +119,30 @@ void Car::turn(Direction dir){
 }
 
 void Car::forward(){
-    digitalWrite(motor1Pin1, HIGH);
-    digitalWrite(motor1Pin2, LOW);
-    digitalWrite(motor2Pin1, HIGH);
-    digitalWrite(motor2Pin2, LOW);
+    digitalWrite(motor1Pin1, LOW);
+    digitalWrite(motor1Pin2, HIGH);
+    digitalWrite(motor2Pin1, LOW);
+    digitalWrite(motor2Pin2, HIGH);
+    
     if(lastDir != straight){
-        for(int i = 100; i<255; i++){
+        for(int i = 100; i<180; i++){
             ledcWrite(pwmChannel1, i);
             ledcWrite(pwmChannel2, i);
-            delay(1);
+            delay(10);
         }
     }    
     lastDir = straight;
 }
 
 void Car::backward(){ // Função para fazer o carrinho andar pra trás
-    digitalWrite(motor1Pin1, LOW);
-    digitalWrite(motor1Pin2, HIGH);
-    digitalWrite(motor2Pin1, LOW);
-    digitalWrite(motor2Pin2, HIGH);
-    for(int i = 100; i<255; i++){
+    digitalWrite(motor1Pin1, HIGH);
+    digitalWrite(motor1Pin2, LOW);
+    digitalWrite(motor2Pin1, HIGH);
+    digitalWrite(motor2Pin2, LOW);
+    for(int i = 100; i<180; i++){
         ledcWrite(enable1Pin, i);
         ledcWrite(enable2Pin, i);
-        delay(1);
+        delay(10);
     }
 }
 
