@@ -90,26 +90,53 @@ Car::Direction Car::decideDirection(u_int16_t* distances){
     return straight; // Padrão se não estiver perto de nada
 }
 
-float calcErr(u_int16_t* distances){
-    float max_dist = 500.0;
-    float norm_esq = distances[0] / max_dist;
+float Car::calErr(u_int16_t* distances){
+    float max_dist = 2000.0; // Distância máxima que o sensor detecta com certa precisão
     float norm_ctr = distances[1] / max_dist;
-    float norm_dir = distances[2] / max_dist;
+    // if (norm_ctr < 0.2) {
+    //     return 0.0;    
+    // }
+    float norm_esq = distances[0]/max_dist; // Normalização dos valores de distância (valores entre 0 e 1)
+    if (norm_esq > 1.0) norm_esq = 1.0; // Limitação do valor normalizado a 1 (caso o sensor acabe detectando algo a mais de 2 metros (2000 mm))
+    Serial.print("esque: ");
+    Serial.println(norm_esq);
+    float norm_dir = distances[2]/max_dist;
+    if (norm_dir > 1.0) norm_dir = 1.0;
+    Serial.print("dir: ");
+    Serial.println(norm_dir);
     float erro = norm_esq-norm_dir;
+    Serial.print("Erro: ");
+    Serial.println(erro);
     return erro;
 }
 
-float forward(float erro){
-    float base_speed = 180;
-    float ajuste = erro * 100; // sensibilidade
+void Car::forward(float erro){
+    float base_speed = 180; // Velocidade padrão dos motores
+    Serial.print ("Erro no forwared;");
+    Serial.print (erro); 
+    Serial.println();
+    float ajuste = erro * 100.0; // Valor de erro ajustado para a magnitude da velocidade (*100)
+    Serial.print("Ajuste: ");
+    Serial.println(ajuste);
     digitalWrite(motor1Pin1, LOW);
     digitalWrite(motor1Pin2, HIGH);
     digitalWrite(motor2Pin1, LOW);
     digitalWrite(motor2Pin2, HIGH);
     int motor_esq = base_speed - ajuste;
     int motor_dir = base_speed + ajuste;
+    if (motor_esq > 255) motor_esq = 255;
+    else if (motor_esq < 0) motor_esq = 0;
+    if (motor_dir > 255) motor_dir = 255;
+    else if (motor_dir < 0) motor_dir = 0;
+    Serial.print("motor_esq: ");
+    Serial.print(motor_esq);
+    Serial.println();
+    Serial.print("motor_dir: ");
+    Serial.print(motor_dir);
+    Serial.println();
     ledcWrite(pwmChannel1, motor_esq);
     ledcWrite(pwmChannel2, motor_dir);
+    return;
 }
 
 void Car::turn(Direction dir){
@@ -171,9 +198,18 @@ void Car::backward(){ // Função para fazer o carrinho andar pra trás
 void Car::mind(DISTSensor& dist){
     u_int16_t now = millis();
     while (millis() - now < 10000){
+        float err;
         vis.reading(dist);
         u_int16_t* distances = vis.getDistances(dist);
-        forward(calcErr(distances));
+        err = calErr(distances);
+        Serial.print("err: ");
+        
+        if(err == 0.0){
+            backward();
+        }else{
+            Serial.println(err);
+            forward(err);
+        }        
     }
 }
 

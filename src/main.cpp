@@ -21,7 +21,7 @@ void setup() {
   Serial.println("Causa: " + String(esp_sleep_get_wakeup_cause()));
   // Reinitialize sensor if waking from deep sleep
   
-  if((dist.measureClosing() && dist.getDistance() <= 300) || dist.getDistance() <= 100){
+  if((dist.measureClosing() && dist.getDistance() <= 600) || dist.getDistance() <= 100){
     car.mind(dist); // Chamada da função responsável por fazer o controle do carrinho (e passando o objeto dist, para permitir que o mesmo objeto seja manipulado por todo o programa)
   }
   delay(100);
@@ -29,4 +29,5 @@ void setup() {
 }
 
 void loop() {
+  
 }

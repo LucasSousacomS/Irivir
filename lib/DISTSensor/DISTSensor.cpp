@@ -15,7 +15,7 @@ bool DISTSensor::measureClosing(){
         if(measure.RangeMilliMeter <= lastMeasure-minDiff){ // Caso a medida atual seja menor ou igual à anterior - 10
             if(closing == 0){ // Caso a variável closing seja 0, essa foi a primeira deteção
                 closing = 1; // Faz closing virar 1, identificando que já houve uma deteção
-                lastMeasure = measure.RangeMilliMeter; // Salva essa medida como a medida anterior par a próxima leitura
+                lastMeasure = measure.RangeMilliMeter; // Salva essa medida como a medida anterior para a próxima leitura
             }
             else{
                 return 1;
@@ -62,7 +62,7 @@ void DISTSensor::begin(){
     if(!lox.begin()){ // Inicialização do sensor de distância
         while (true)
         {
-            /* code */
+            
         }
     }else{
         Serial.println("Sensor de distãncia inicializado corretamente");
