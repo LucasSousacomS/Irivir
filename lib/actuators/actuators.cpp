@@ -90,6 +90,28 @@ Car::Direction Car::decideDirection(u_int16_t* distances){
     return straight; // Padrão se não estiver perto de nada
 }
 
+float calcErr(u_int16_t* distances){
+    float max_dist = 500.0;
+    float norm_esq = distances[0] / max_dist;
+    float norm_ctr = distances[1] / max_dist;
+    float norm_dir = distances[2] / max_dist;
+    float erro = norm_esq-norm_dir;
+    return erro;
+}
+
+float forward(float erro){
+    float base_speed = 180;
+    float ajuste = erro * 100; // sensibilidade
+    digitalWrite(motor1Pin1, LOW);
+    digitalWrite(motor1Pin2, HIGH);
+    digitalWrite(motor2Pin1, LOW);
+    digitalWrite(motor2Pin2, HIGH);
+    int motor_esq = base_speed - ajuste;
+    int motor_dir = base_speed + ajuste;
+    ledcWrite(pwmChannel1, motor_esq);
+    ledcWrite(pwmChannel2, motor_dir);
+}
+
 void Car::turn(Direction dir){
     if(dir == left){ 
         digitalWrite(motor1Pin1, LOW);
@@ -118,7 +140,7 @@ void Car::turn(Direction dir){
     }
 }
 
-void Car::forward(){
+void Car::forwardSimp(){
     digitalWrite(motor1Pin1, LOW);
     digitalWrite(motor1Pin2, HIGH);
     digitalWrite(motor2Pin1, LOW);
@@ -150,10 +172,8 @@ void Car::mind(DISTSensor& dist){
     u_int16_t now = millis();
     while (millis() - now < 10000){
         vis.reading(dist);
-        u_int16_t* distances =  vis.getDistances(dist);
-        Direction dir = decideDirection(distances);
-        if(dir != straight) turn(dir);
-        else forward();
+        u_int16_t* distances = vis.getDistances(dist);
+        forward(calcErr(distances));
     }
 }
 
