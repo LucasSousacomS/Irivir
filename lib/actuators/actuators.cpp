@@ -14,6 +14,8 @@
 #define leftAngle 130
 #define rightAngle 50
 #define straightAngle 90
+#define maxMotorDir 200
+#define maxMotorEsq 200
 
 
 uint8_t resolution = 8;
@@ -124,9 +126,9 @@ void Car::forward(float erro){
     digitalWrite(motor2Pin2, HIGH);
     int motor_esq = base_speed - ajuste;
     int motor_dir = base_speed + ajuste;
-    if (motor_esq > 255) motor_esq = 255;
+    if (motor_esq > maxMotorEsq) motor_esq = maxMotorEsq;
     else if (motor_esq < 0) motor_esq = 0;
-    if (motor_dir > 255) motor_dir = 255;
+    if (motor_dir > maxMotorDir) motor_dir = maxMotorDir;
     else if (motor_dir < 0) motor_dir = 0;
     Serial.print("motor_esq: ");
     Serial.print(motor_esq);
@@ -137,6 +139,16 @@ void Car::forward(float erro){
     ledcWrite(pwmChannel1, motor_esq);
     ledcWrite(pwmChannel2, motor_dir);
     return;
+}
+
+void Car::stop(){
+    ledcWrite(pwmChannel1, 0);
+    ledcWrite(pwmChannel2, 0);
+    digitalWrite(motor1Pin1, LOW);
+    digitalWrite(motor1Pin2, LOW);
+    digitalWrite(motor2Pin1, LOW);
+    digitalWrite(motor2Pin2, LOW);
+    Serial.print("SSSSSSSSSSSSSSstop!!");
 }
 
 void Car::turn(Direction dir){
@@ -205,12 +217,13 @@ void Car::mind(DISTSensor& dist){
         Serial.print("err: ");
         
         if(err == 0.0){
-            backward();
+            forward(err);
         }else{
             Serial.println(err);
             forward(err);
         }        
     }
+    stop();
 }
 
 void Car::begin(){

@@ -38,6 +38,8 @@ class Car{ // Classe de controle do carrinho
 
     void backward(); // Função para fazer o carrinho andar pra trás
 
+    void stop();
+
     public:
     void begin();
 
