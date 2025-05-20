@@ -28,12 +28,17 @@ class Car{ // Classe de controle do carrinho
     Direction lastDir;
     Vision vis;
     Direction decideDirection(uint16_t* distances); // Função que decide a direção que o carrinho irá se mover
+    float calErr(uint16_t* distances);
 
     void turn(Direction dir);// Função para fazer o carrinho virar
 
-    void forward(); // Função para fazer o carrinho andar pra frente
+    void forward(float erro);
+
+    void forwardSimp(); // Função para fazer o carrinho andar pra frente    
 
     void backward(); // Função para fazer o carrinho andar pra trás
+
+    void stop();
 
     public:
     void begin();
