@@ -1,4 +1,5 @@
 #include <actuators.h>
+#include <debug.h>
 #define servoPin 13
 #define servoDelay 7
 #define pwmChannel1 2
@@ -20,7 +21,7 @@
 
 uint8_t resolution = 8;
 uint32_t freq = 30000;
-int dutyCycle = 200;
+float base_speed = 180; // Velocidade padrão dos motores
 Servo servo1;
 
 void Vision::begin(){
@@ -71,20 +72,20 @@ u_int16_t* Vision::getDistances(DISTSensor& dist){ // Obtenção do array distan
 
 Car::Direction Car::decideDirection(u_int16_t* distances){
     int smallestIndex = 0; // Variável para comparação de valores do array
-    Serial.print("--------------------------------------DECIDE DIRECITONS-----------------------------------");
+    DEBUG_PRINT("--------------------------------------DECIDE DIRECITONS-----------------------------------");
     // Encontrar o menor valor no array de distâncias
     for (int i = 1; i < 3; i++) {
-        Serial.println("Distancias");
-        Serial.println(distances[i]);
+        DEBUG_PRINTLN("Distancias");
+        DEBUG_PRINTLN(distances[i]);
         if (distances[i] < distances[smallestIndex]) {
-            // Serial.println("Distância lida:" + String(distances[i] + "na posição" + String(i)));
+            // DEBUG_PRINTLN("Distância lida:" + String(distances[i] + "na posição" + String(i)));
             smallestIndex = i;
         }
     }
 
     // Decidir para onde virar
     if (distances[smallestIndex] <= 500) {
-        Serial.println("A menor Distância lida:" + String(distances[smallestIndex]));
+        DEBUG_PRINTLN("A menor Distância lida:" + String(distances[smallestIndex]));
         if (smallestIndex == 0) return right; // O valor lido quando o sensor está na esquerda (eyeLeft) é guardado no índice 0
         if (smallestIndex == 2) return left; // O valor lido quando o sensor está na direita (eyeRight) é guardado no índice 2
     }
@@ -99,26 +100,25 @@ float Car::calErr(u_int16_t* distances){
     // }
     float norm_esq = distances[0]/max_dist; // Normalização dos valores de distância (valores entre 0 e 1)
     if (norm_esq > 1.0) norm_esq = 1.0; // Limitação do valor normalizado a 1 (caso o sensor acabe detectando algo a mais de 2 metros (2000 mm))
-    Serial.print("esque: ");
-    Serial.println(norm_esq);
+    DEBUG_PRINT("esque: ");
+    DEBUG_PRINTLN(norm_esq);
     float norm_dir = distances[2]/max_dist;
     if (norm_dir > 1.0) norm_dir = 1.0;
-    Serial.print("dir: ");
-    Serial.println(norm_dir);
+    DEBUG_PRINT("dir: ");
+    DEBUG_PRINTLN(norm_dir);
     float erro = norm_esq-norm_dir; // Calculo do erro, levando em consideração a diferença entre as detecções de distância à esquerda e à direita
-    Serial.print("Erro: ");
-    Serial.println(erro);
+    DEBUG_PRINT("Erro: ");
+    DEBUG_PRINTLN(erro);
     return erro;
 }
 
 void Car::forward(float erro){
-    float base_speed = 180; // Velocidade padrão dos motores
-    Serial.print ("Erro no forwared;");
-    Serial.print (erro); 
-    Serial.println();
+    DEBUG_PRINT ("Erro no forwared;");
+    DEBUG_PRINT (erro); 
+    DEBUG_PRINTLN();
     float ajuste = erro * 100.0; // Valor de erro ajustado para a magnitude da velocidade (*100)
-    Serial.print("Ajuste: ");
-    Serial.println(ajuste);
+    DEBUG_PRINT("Ajuste: ");
+    DEBUG_PRINTLN(ajuste);
     digitalWrite(motor1Pin1, LOW);
     digitalWrite(motor1Pin2, HIGH);
     digitalWrite(motor2Pin1, LOW);
@@ -145,12 +145,12 @@ void Car::forward(float erro){
     }
     if (motor_esq > maxMotorEsq) motor_esq = maxMotorEsq; // Limitando a velocidade máxima dos motores, evitando consumo elevado de corrente
     if (motor_dir > maxMotorDir) motor_dir = maxMotorDir;
-    Serial.print("motor_esq: ");
-    Serial.print(motor_esq);
-    Serial.println();
-    Serial.print("motor_dir: ");
-    Serial.print(motor_dir);
-    Serial.println();
+    DEBUG_PRINT("motor_esq: ");
+    DEBUG_PRINT(motor_esq);
+    DEBUG_PRINTLN();
+    DEBUG_PRINT("motor_dir: ");
+    DEBUG_PRINT(motor_dir);
+    DEBUG_PRINTLN();
     ledcWrite(pwmChannel1, motor_esq); // Acionamento dos motores utilizando os valores calculados anteriormente como duty cycle
     ledcWrite(pwmChannel2, motor_dir);
     return;
@@ -230,12 +230,12 @@ void Car::mind(DISTSensor& dist){
         vis.reading(dist); // Método utilizado para avaliar as distâncias de obstáculos à frente doc carrinho
         u_int16_t* distances = vis.getDistances(dist); // Obtenção dos valores de distância lidos pelo sensor na etapa anterior
         err = calErr(distances); // Cálculo do erro (diferença entre as distâncias na direita e na esquerda do carrinho)
-        Serial.print("err: ");
+        DEBUG_PRINT("err: ");
         
         if(err == 0.0){
             forward(err);
         }else{
-            Serial.println(err);
+            DEBUG_PRINTLN(err);
             forward(err); // Chamada da função "forward", responsável por movimentar o carrinho para frente controlando o duty cycle do PWM de cada motor para alterar a direção do carrinho
         }        
     }
@@ -243,7 +243,7 @@ void Car::mind(DISTSensor& dist){
 }
 
 void Car::begin(){
-    Serial.println("Car initialized");
+    DEBUG_PRINTLN("Car initialized");
     vis.begin(); // Inicializando o movimento do sensor de distância via servo motor
     pinMode(motor1Pin1, OUTPUT); // Configurando os pinos de enable como output
     pinMode(motor1Pin2, OUTPUT);

@@ -1,4 +1,5 @@
 #include <DISTSensor.h>
+#include <debug.h>
 
 // Função para detectar algo se aproximando
 bool DISTSensor::measureClosing(){
@@ -23,7 +24,7 @@ bool DISTSensor::measureClosing(){
         }
         lastMeasure = measure.RangeMilliMeter;
         delay(1);
-        Serial.println(measure.RangeMilliMeter);
+        DEBUG_PRINTLN(measure.RangeMilliMeter);
     }
     return 0;
 }
@@ -35,7 +36,7 @@ uint16_t DISTSensor::getDistance(){
     // }
     lox.rangingTest(&measure, false); // Leitura do sensor de distância
     if (measure.RangeStatus != 4) {  // Caso não haja falha na leitura
-        Serial.println(measure.RangeMilliMeter);
+        DEBUG_PRINTLN(measure.RangeMilliMeter);
         return measure.RangeMilliMeter; // retorna a distância
     } else {
         return 6000; // Caso haja falha, retorna um valor qualquer
@@ -44,9 +45,9 @@ uint16_t DISTSensor::getDistance(){
 }
 
 u_int16_t* DISTSensor::getDistances(){
-    Serial.println("elas:");
+    DEBUG_PRINTLN("elas:");
     for(int i = 0; i<3; i++){
-        Serial.println(distances[i]);
+        DEBUG_PRINTLN(distances[i]);
     }
     return distances; // Retorna um array com 3 distâncias
 }
@@ -65,6 +66,6 @@ void DISTSensor::begin(){
             
         }
     }else{
-        Serial.println("Sensor de distãncia inicializado corretamente");
+        DEBUG_PRINTLN("Sensor de distãncia inicializado corretamente");
     }
 }
