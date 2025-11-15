@@ -3,11 +3,17 @@
 
 class DISTSensor{
     private:
-        u_int16_t distance;
+        VL53L0X_RangingMeasurementData_t measure;
+        u_int16_t distances[3];        
         Adafruit_VL53L0X lox = Adafruit_VL53L0X();
 
+
     public:
+        u_int16_t len = sizeof(distances)/sizeof(distances[0]);
         void begin();
         bool measureClosing();
-        bool measure();
+        uint16_t getDistance();
+        uint16_t* getDistances();
+        void setDistances(u_int8_t pos);
+        bool perfMeasure();
 };
